@@ -1,0 +1,17 @@
+{% extends '@PrestaShop/Admin/layout.html.twig' %}
+
+{% block content %}
+    <div id="app">
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+
+    {% if resources is defined %}
+        {%
+            include '@Modules/prestashopvite/views/templates/components/scripts.html.twig'
+            with { 'styles': resources['css'], 'scripts': resources['js'] }
+        %}
+    {% endif %}
+{% endblock %}

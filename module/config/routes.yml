@@ -1,0 +1,7 @@
+prestashopvite_index:
+    path: /prestashopvite
+    methods: [GET]
+    defaults:
+        _controller: 'Module\LouisMarotta\PrestashopVite\Controllers\Admin\IndexController::indexAction'
+        _legacy_controller: 'AdminPrestashopVite'
+        _legacy_link: 'AdminPrestashopVite'

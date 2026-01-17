@@ -1,0 +1,13 @@
+<!-- Resources Start -->
+{% if styles is defined and styles is not empty %}
+    {% for style in styles %}
+        <link rel="stylesheet" type="text/css" href="{{ style.src }}" media="{{ style.media }}">
+    {% endfor %}
+{% endif %}
+
+{% if scripts is defined and scripts is not empty %}
+    {% for script in scripts %}
+        <script {% if script.attributes == 'module' %}type="module"{% endif %} src="{{ script.src }}"></script>
+    {% endfor %}
+{% endif %}
+<!-- Resources End -->

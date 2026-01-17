@@ -1,0 +1,39 @@
+{
+  "name": "prestashop_plugin_template",
+  "description": "PrestaShop module built with Vite and Typescript",
+  "version": "0.0.1",
+  "author": {
+    "name": "LouisMarotta",
+    "email": "loumb31@gmail.com"
+  },
+  "license": "MIT",
+  "private": true,
+  "type": "module",
+  "keywords": [
+    "prestashop",
+    "vite",
+    "typescript"
+  ],
+  "scripts": {
+    "dev": "vite",
+    "preprocess": "node ./bin/preprocess.js",
+    "build": "tsc && vite build && node ./bin/build.js",
+    "preview": "vite preview",
+    "clean": "rimraf dist"
+  },
+  "devDependencies": {
+    "@logtape/logtape": "^1.3.6",
+    "@logtape/pretty": "^1.3.6",
+    "@types/jquery": "^3.5.33",
+    "@zip.js/zip.js": "^2.8.14",
+    "archiver": "^7.0.1",
+    "browserslist": "^4.28.1",
+    "es-toolkit": "^1.43.0",
+    "lightningcss": "^1.30.2",
+    "path": "^0.12.7",
+    "rimraf": "^6.1.2",
+    "simple-git": "^3.30.0",
+    "typescript": "~5.9.3",
+    "vite": "^7.3.1"
+  }
+}

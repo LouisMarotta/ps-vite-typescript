@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<module>
+    <name>prestashopvite</name>
+    <displayName><![CDATA[PS Vite]]></displayName>
+    <version><![CDATA[0.0.1]]></version>
+    <description><![CDATA[A PrestaShop module template with Vite and Typescript]]></description>
+    <author><![CDATA[Louis Marotta]]></author>
+    <tab><![CDATA[]]></tab>
+    <is_configurable>1</is_configurable>
+    <need_instance>1</need_instance>
+</module>

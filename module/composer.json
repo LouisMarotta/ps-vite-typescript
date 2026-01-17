@@ -1,0 +1,27 @@
+{
+  "name": "louismarotta/prestashopvite",
+  "version": "0.0.1",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "LouisMarotta",
+      "email": "loumb31@gmail.com"
+    }
+  ],
+  "require": {
+    "php": ">=7.4"
+  },
+  "autoload": {
+    "psr-4": {
+      "Module\\LouisMarotta\\PrestashopVite\\": "src/"
+    },
+    "classmap": ["prestashopvite.php", "controllers/"],
+    "config": {
+      "prepend-autoloader": false
+    },
+    "type": "prestashop-module"
+  },
+  "require-dev": {
+    "stancer/php-stubs-prestashop": "^8.2"
+  }
+}
