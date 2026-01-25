@@ -23,7 +23,7 @@ let name = packageData.name;
 let git = simpleGit(BASE_PATH);
 
 // This could be empty if no repository is here
-let branch = git.revparse(['--abbrev-ref HEAD']);
+let branch = git.revparse(['--abbrev-ref HEAD']) ?? 'local';
 
 console.log(branch);
 logger.debug(`${name}_${branch}`);
@@ -53,7 +53,7 @@ async function main() {
         logger.info("Composer dependencies installed!");
 
         logger.debug('Zipping file...');
-        jsCreateZip(`${BUILD_PATH}/${filesystemName}.zip`, `${BUILD_PATH}/${filesystemName}/`);
+        createZip(`${BUILD_PATH}/${filesystemName}.zip`, `${BUILD_PATH}/${filesystemName}/`);
 
         logger.info('Done!', 'ok');
     } catch (e) {
