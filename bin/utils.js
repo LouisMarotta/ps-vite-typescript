@@ -119,7 +119,7 @@ export function setupComposer(path = '') {
  * @class
  */
 export class TemplateEngine {
-    constructor(pattern = /{{\s*(\w+?)\s*}}/g) {
+    constructor(pattern = /{{\s*([\w.]+?)\s*}}/g) {
         this.pattern = pattern;
     }
 
