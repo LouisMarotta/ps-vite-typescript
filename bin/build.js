@@ -5,6 +5,7 @@ import { simpleGit } from 'simple-git';
 import { snakeCase } from 'es-toolkit/string';
 import packageData from '../package.json' with { type: "json" };
 import { createZip, jsCreateZip, setupComposer } from './utils.js';
+import { compileIncludes } from './preprocess.js';
 import { getLogger } from "@logtape/logtape";
 
 let logger = getLogger('ps-module-builder');
@@ -23,7 +24,8 @@ let name = packageData.name;
 let git = simpleGit(BASE_PATH);
 
 // This could be empty if no repository is here
-let branch = git.revparse(['--abbrev-ref HEAD']) ?? 'local';
+let branch = await git.revparse({'--abbrev-ref': 'HEAD'});
+if (!branch) branch = 'local';
 
 console.log(branch);
 logger.debug(`${name}_${branch}`);
@@ -47,14 +49,14 @@ async function main() {
         });
 
         // TODO: Copy index.php from here into
+        compileIncludes(false, `${path}/includes.php`);
 
         logger.debug("Installing composer dependencies");
         setupComposer(path);
         logger.info("Composer dependencies installed!");
 
         logger.debug('Zipping file...');
-        createZip(`${BUILD_PATH}/${filesystemName}.zip`, `${BUILD_PATH}/${filesystemName}/`);
-
+        createZip(`${BUILD_PATH}/${filesystemName}_${branch}.zip`, `${BUILD_PATH}/${filesystemName}/`);
         logger.info('Done!', 'ok');
     } catch (e) {
         logger.error('Error: ' + e, 'error');

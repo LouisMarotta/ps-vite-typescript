@@ -1,5 +1,5 @@
 {
-  "name": "prestashop_plugin_template",
+  "name": "prestashopvite",
   "description": "PrestaShop module built with Vite and Typescript",
   "version": "0.0.1",
   "author": {
@@ -15,7 +15,7 @@
     "typescript"
   ],
   "scripts": {
-    "dev": "vite",
+    "dev": "npm run preprocess && vite",
     "preprocess": "node ./bin/preprocess.js",
     "build": "tsc && vite build && node ./bin/build.js",
     "preview": "vite preview",

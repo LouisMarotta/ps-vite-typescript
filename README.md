@@ -65,6 +65,8 @@ services:
 
 - To get jQuery's type completions, you must add `/// <reference types="jquery" />` at the start of the script
 
+- You must keep the project name in `package.json` the same as the module name
+
 - If you are working with multiple vite projects at the same time, it's very recommended to change the `hmr.json` port to avoid conflicts
 
 - You can speed up bundling times by switching to Rolldown in `package.json`, it's currently still in beta

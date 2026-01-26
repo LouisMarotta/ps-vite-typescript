@@ -13,7 +13,7 @@ class Loader {
     CONST POSITION_HEAD = 'top';
     CONST POSITION_BOTTOM = 'bottom';
 
-    private $host = 'http://localhost:5173';
+    private $vite_host = 'http://localhost:5173';
     private $module = null;
     private $manifest = [];
     private $dev = false;
@@ -23,9 +23,11 @@ class Loader {
 
     /**
      * @param \Module $module
+     * @param bool $dev
+     * @param string|null $vite_host
      * @return void
      */
-    public function __construct($module, $dev = false) {
+    public function __construct($module, $dev = false, $vite_host = null) {
         // TODO: Set this->host by checking the constant variables
         $this->module = $module;
         $this->view_path = _PS_MODULE_DIR_ . $this->module->name . '/views/';
@@ -33,6 +35,14 @@ class Loader {
 
         $this->setPriority(50);
         $this->setPosition(self::POSITION_BOTTOM);
+
+        if (!$vite_host) {
+            $vite_constant = $module->getModuleConstant() . '_VITE';
+
+            $this->vite_host = defined($vite_constant)
+                ? constant($vite_constant)
+                : $this->vite_host;
+        }
 
         $this->manifest = $this->parseManifest();
 
@@ -86,7 +96,7 @@ class Loader {
     }
 
     public function getHMRUrl() {
-        return $this->host . '/@vite/client';
+        return $this->vite_host . '/@vite/client';
     }
 
 

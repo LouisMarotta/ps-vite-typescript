@@ -6,8 +6,8 @@ if (!defined('_PS_VERSION_')) {
 }
 
 include_once dirname(__FILE__) . '/vendor/autoload.php';
-if (file_exists(dirname(__FILE__) . '/includes.vite.php')) {
-    include_once dirname(__FILE__) . '/includes.vite.php';
+if (file_exists(dirname(__FILE__) . '/includes.inc.php')) {
+    include_once dirname(__FILE__) . '/includes.inc.php';
 }
 
 use \Module\LouisMarotta\PrestashopVite\Traits\ViteModuleTrait;
@@ -76,5 +76,6 @@ class PrestashopVite extends Module
     }
 
     public function getModuleConstant() {
+        return strtoupper($this->name);
     }
 }

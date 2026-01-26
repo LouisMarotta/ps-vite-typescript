@@ -1,4 +1,5 @@
-import { promises as fs } from 'fs';
+import { promises as fs, createWriteStream } from 'fs';
+
 import os from 'os';
 import { execSync } from 'child_process';
 import { pad } from 'es-toolkit/string';
@@ -36,6 +37,7 @@ if (!logConfigured) {
 let logger = getLogger('ps-module-builder');
 
 export function createZip(zipPath, modulePath) {
+    // let file = fs.open(zipPath, 'w');
     let output = fs.createWriteStream(zipPath);
     output.on('close', function () {
         logger.debug('>', (archive.pointer() / 1000000) + ' megabytes');
