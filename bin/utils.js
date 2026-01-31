@@ -1,4 +1,5 @@
-import { promises as fs, createWriteStream } from 'fs';
+// import { promises as fs, createWriteStream } from 'fs';
+import * as fs from 'fs';
 
 import os from 'os';
 import { execSync } from 'child_process';

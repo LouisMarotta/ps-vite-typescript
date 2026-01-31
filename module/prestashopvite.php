@@ -76,6 +76,6 @@ class PrestashopVite extends Module
     }
 
     public function getModuleConstant() {
-        return strtoupper($this->name);
+        return str_replace('-', '_', strtoupper($this->name));
     }
 }
