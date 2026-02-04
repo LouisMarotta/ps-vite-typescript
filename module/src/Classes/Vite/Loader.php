@@ -27,15 +27,22 @@ class Loader {
      * @param string|null $vite_host
      * @return void
      */
-    public function __construct($module, $dev = false, $vite_host = null) {
-        // TODO: Set this->host by checking the constant variables
+    public function __construct($module, $dev = null, $vite_host = null) {
         $this->module = $module;
         $this->view_path = _PS_MODULE_DIR_ . $this->module->name . '/views/';
-        $this->dev = $dev;
+
+        // Handle dev mode
+        $dev_constant = $module->getModuleConstant() . '_DEV';
+        if ($dev === null && defined($dev_constant)) {
+            $this->dev = constant($dev_constant);
+        } else {
+            $this->dev = $dev;
+        }
 
         $this->setPriority(50);
         $this->setPosition(self::POSITION_BOTTOM);
 
+        // Get the vite host
         if (!$vite_host) {
             $vite_constant = $module->getModuleConstant() . '_VITE';
 
@@ -44,6 +51,7 @@ class Loader {
                 : $this->vite_host;
         }
 
+        // Save the manifest configs
         $this->manifest = $this->parseManifest();
 
         $this->configuration = null;
@@ -80,6 +88,9 @@ class Loader {
         $this->priority = max(0, min(999, $priority));
     }
 
+    /**
+     * Read and parse the manifest file
+     */
     private function parseManifest() {
         $manifest = [];
 
@@ -95,6 +106,10 @@ class Loader {
         return $manifest;
     }
 
+    /**
+     * Get the Hot Module Reload script url
+     * @return string
+     */
     public function getHMRUrl() {
         return $this->vite_host . '/@vite/client';
     }
@@ -135,7 +150,7 @@ class Loader {
                 'inline' => false,
                 'attributes' => $this->dev ? 'module' : null,
                 'src' => $this->dev
-                    ? $this->host . '/' . $dev_url
+                    ? $this->vite_host . '/' . $dev_url
                     : $this->getUriFromPath($this->view_path . $data['file']),
                 'version' => $this->module->version ?? null,
                 'server' => $this->dev ? true : false
