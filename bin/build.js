@@ -12,25 +12,19 @@ let logger = getLogger('ps-module-builder');
 
 const BASE_PATH = path.resolve(process.cwd());
 const BUILD_PATH = `${BASE_PATH}/dist`;
-
-// Should be fetched from `/dist/module` instead
 const MODULE_PATH = `${BASE_PATH}/module`;
 
-let filesystemName = snakeCase(packageData.name);
+let moduleName = packageData.name;
+let filesystemName = snakeCase(moduleName);
 
-
-// The archive name should have the package + branch name
-let name = packageData.name;
-let git = simpleGit(BASE_PATH);
-
-// This could be empty if no repository is here
+let git = await simpleGit({
+    baseDir: BASE_PATH,
+    binary: 'git'
+});
 let branch = 'local';
 try {
-    branch = await git.revparse({'--abbrev-ref': 'HEAD'});
+    branch = await git.revparse(['--abbrev-ref', 'HEAD']);
 } catch (e) { }
-
-console.log(branch);
-logger.debug(`${name}_${branch}`);
 
 async function addIndexPHP() {
     async function* walk(dir) {
