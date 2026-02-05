@@ -7,7 +7,7 @@
 
 {% if scripts is defined and scripts is not empty %}
     {% for script in scripts %}
-        <script {% if script.attributes == 'module' %}type="module"{% endif %} src="{{ script.src }}"></script>
+        <script {% if script.attributes == 'module' %}type="module"{else}{{script.attributes}}{% endif %} src="{{ script.src }}"></script>
     {% endfor %}
 {% endif %}
 <!-- Resources End -->
