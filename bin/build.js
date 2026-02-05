@@ -44,8 +44,8 @@ async function main() {
             recursive: true
         });
 
-        // TODO: Copy index.php from here into
-        compileIncludes(false, `${path}/includes.php`);
+        // Generate the includes file with DEV mode off
+        compileIncludes(false, `${path}/includes.inc.php`);
 
         logger.debug("Installing composer dependencies");
         setupComposer(path);
