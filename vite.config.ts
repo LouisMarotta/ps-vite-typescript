@@ -3,6 +3,7 @@ import { resolve, dirname } from 'path';
 import { fileURLToPath } from 'url';
 import browserslist from 'browserslist';
 import { browserslistToTargets } from 'lightningcss';
+import { viteStaticCopy } from 'vite-plugin-static-copy';
 
 import hmrConfig from './hmr.json' with { type: "json" };
 import data from './package.json' with { type: "json" };
@@ -12,14 +13,34 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const license = `/**
  *  @version        v${data.version}
  *  @description    ${data.description}
- *  @author         Louis Marotta <loumb31@gmail.com>
- *  @license        MIT License
+ *  @author         ${data.author.name} <${data.author.email}>
+ *  @license        ${data.license} License
  */`;
 
 const outputPath = resolve('./module/views/');
 
 // This will generate multiple scripts based on the entry points (front and back)
 export default defineConfig({
+    plugins: [
+        viteStaticCopy({
+            targets: [
+                {
+                    src: 'src/static/js/*',
+                    dest: 'js',
+                },
+                {
+                    src: 'src/static/css/*',
+                    dest: 'css'
+                },
+                {
+                    src: 'src/static/img/*',
+                    dest: 'img'
+                }
+            ],
+            silent: true,
+            structured: true
+        })
+    ],
     css: {
         transformer: 'lightningcss',
         lightningcss: {

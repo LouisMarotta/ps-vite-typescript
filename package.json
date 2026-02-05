@@ -3,7 +3,7 @@
   "description": "PrestaShop module built with Vite and Typescript",
   "version": "0.0.1",
   "author": {
-    "name": "LouisMarotta",
+    "name": "Louis Marotta",
     "email": "loumb31@gmail.com"
   },
   "license": "MIT",
@@ -34,6 +34,7 @@
     "rimraf": "^6.1.2",
     "simple-git": "^3.30.0",
     "typescript": "~5.9.3",
-    "vite": "^7.3.1"
+    "vite": "^7.3.1",
+    "vite-plugin-static-copy": "^3.2.0"
   }
 }
