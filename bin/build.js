@@ -24,6 +24,9 @@ let git = await simpleGit({
 let branch = 'local';
 try {
     branch = await git.revparse(['--abbrev-ref', 'HEAD']);
+
+    // Get the last segment of the branch
+    branch = branch.split('/').slice(-1)[0];
 } catch (e) { }
 
 async function addIndexPHP() {
