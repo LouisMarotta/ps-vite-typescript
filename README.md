@@ -19,10 +19,10 @@ A boilerplate Prestashop Module to develop with Vite's HMR capabilities.
 - Building once is required before installing the module and developing, the `\Vite\Loader` helper class needs the generated `manifest.json` to handle the scripts and styles.
 
 ```bash
-pnpm i
-pnpm run build
+bun install
+bun run build
 ```
-- When running with `pnpm run dev`, the scripts will be served from `http://127.0.0.1:5173`
+- When running with `bun run dev`, the scripts will be served from `http://127.0.0.1:5173`
 
 ## DDEV Support
 
