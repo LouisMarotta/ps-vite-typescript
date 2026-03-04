@@ -12,8 +12,6 @@ jobs:
       docker:
         image: docker:28.5.2
         options: --privileged
-        ports:
-          - 8181:80
     
     steps:
       - name: Checkout code
