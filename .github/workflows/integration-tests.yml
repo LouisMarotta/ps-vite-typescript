@@ -24,8 +24,9 @@ jobs:
         run: |
           docker compose -f docker-compose.yml up --build -d
 
-      - name: Install Playwright
+      - name: Install dependencies
         run: |
+          bun install
           bunx playwright install
 
       - name: Run Playwright Tests
