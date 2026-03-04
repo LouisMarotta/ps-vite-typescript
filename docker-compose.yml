@@ -1,0 +1,44 @@
+services:
+  mysql:
+    container_name: db
+    image: mysql:${MYSQL_VERSION:-8.1}
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_PASSWORD:-prestashop}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-prestashop}
+      MYSQL_USER: ${MYSQL_USER:-prestashop}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-prestashop}
+    volumes:
+      - prestashop-db:/var/lib/mysql
+    networks:
+      - prestashop_network
+  prestashop:
+    container_name: prestashop
+    image: prestashop/prestashop:8
+    restart: unless-stopped
+    depends_on:
+      - mysql
+    ports:
+      - 8181:80
+    volumes:
+      - ./prestashop:/var/www/html/:rw
+      - ./module:/var/www/html/modules/prestashopvite/
+    environment:
+      DB_SERVER: db
+      PS_FOLDER_ADMIN: ${PS_FOLDER_ADMIN:-prestashop:ps_admin}
+      ADMIN_MAIL: ${PS_ADMIN_EMAIL:-admin@demo.com}
+      ADMIN_PASSWD: ${PS_ADMIN_PASSWORD:-admin123}
+
+      DB_NAME: ${MYSQL_DATABASE:-prestashop}
+      DB_USER: ${MYSQL_USER:-prestashop}
+      DB_PASSWD: ${MYSQL_PASSWORD:-prestashop}
+
+      PS_DEV_MODE: 1
+      PS_INSTALL_AUTO: 1
+      PS_DOMAIN: ${BASE_URL:-localhost:8181}
+    networks:
+      - prestashop_network
+networks:
+    prestashop_network:
+volumes:
+    prestashop-db:
