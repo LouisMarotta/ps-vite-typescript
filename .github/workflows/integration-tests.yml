@@ -1,0 +1,38 @@
+name: Run Integration Tests in Docker
+
+on:
+  workflow_dispatch:
+
+jobs:
+  setup-and-test:
+    runs-on: ubuntu-latest
+
+    services:
+      docker:
+        image: docker:28.5.2
+        options: --privileged
+        ports:
+          - 8181:80
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install Bun
+        uses: oven-sh/setup-bun@v2
+
+      - name: Set up Docker
+        run: |
+          docker-compose -f docker-compose.yml up --build -d
+
+      - name: Install Playwright
+        run: |
+          bunx install playwright
+
+      - name: Run Playwright Tests
+        run: |
+          bun run playwright:test
+
+      - name: Clean up Docker
+        run: |
+          docker-compose down 
