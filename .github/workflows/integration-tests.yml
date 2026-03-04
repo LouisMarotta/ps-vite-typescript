@@ -17,16 +17,14 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Install Bun
-        uses: oven-sh/setup-bun@v2
-
       - name: Set up Docker
         run: |
           docker compose -f docker-compose.yml up --build -d
 
       - name: Install Playwright
+        uses: oven-sh/setup-bun@v2
         run: |
-          bunx install playwright
+          bunx playwright install
 
       - name: Run Playwright Tests
         run: |
