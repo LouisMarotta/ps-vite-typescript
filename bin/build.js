@@ -51,7 +51,7 @@ async function main() {
         compileIncludes(false, `${path}/includes.inc.php`);
 
         logger.debug("Installing composer dependencies");
-        setupComposer(path);
+        await setupComposer(path);
         logger.info("Composer dependencies installed!");
 
         logger.debug('Zipping file...');
