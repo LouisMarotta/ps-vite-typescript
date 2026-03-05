@@ -7,6 +7,7 @@ import packageData from '../package.json' with { type: "json" };
 import { createZip, jsCreateZip, setupComposer } from './utils.js';
 import { compileIncludes } from './preprocess.js';
 import { getLogger } from "@logtape/logtape";
+import { argv } from 'process';
 
 let logger = getLogger('ps-module-builder');
 
@@ -41,11 +42,21 @@ async function addIndexPHP() {
 
 async function main() {
     try {
-        let path = `${BUILD_PATH}/${filesystemName}`;
-        logger.info('Moving file to ' + path);
-        fs.cpSync(MODULE_PATH, path, {
-            recursive: true
-        });
+        const [, , ...args] = argv;
+
+        let isZipAction = args.length > 0 && args[0] == 'zip';
+
+        let path = isZipAction
+            ? `${BUILD_PATH}/${filesystemName}`
+            : MODULE_PATH;
+
+        if (isZipAction) {
+            logger.info('Moving file to ' + path);
+            fs.cpSync(MODULE_PATH, path, {
+                recursive: true
+            });
+        }
+
 
         // Generate the includes file with DEV mode off
         compileIncludes(false, `${path}/includes.inc.php`);
@@ -54,12 +65,13 @@ async function main() {
         await setupComposer(path);
         logger.info("Composer dependencies installed!");
 
-        logger.debug('Zipping file...');
-
-        let zipname = branch
-            ? `${filesystemName}_${branch}.zip`
-            : `${filesystemName}.zip`;
-        createZip(`${BUILD_PATH}/${zipname}`, `${BUILD_PATH}/${filesystemName}/`);
+        if (isZipAction) {
+            logger.debug('Zipping file...');
+            let zipname = branch
+                ? `${filesystemName}_${branch}.zip`
+                : `${filesystemName}.zip`;
+            createZip(`${BUILD_PATH}/${zipname}`, `${BUILD_PATH}/${filesystemName}/`);
+        }
         logger.info('Done!', 'ok');
     } catch (e) {
         logger.error('Error: ' + e, 'error');

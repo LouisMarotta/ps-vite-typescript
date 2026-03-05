@@ -2,6 +2,8 @@
 
 namespace Module\LouisMarotta\PrestashopVite\Classes;
 
+if (!defined('_PS_VERSION_')) { exit; }
+
 use JavascriptManager;
 
 /**

@@ -13,7 +13,6 @@ import { prettyFormatter } from "@logtape/pretty";
 import { getLogger } from "@logtape/logtape";
 import { ZipWriter,  fs as zipFs } from '@zip.js/zip.js';
 import { writeFile } from 'fs/promises';
-import { compose } from 'stream';
 
 
 const isWin = os.platform() === 'win32';
@@ -114,7 +113,7 @@ export async function setupComposer(run_path = '') {
 
         run('php ' + composerInstaller + ' --install-dir=' + basePath + '/bin --filename=composer --2.2');
     }
-    
+
     let commands = [
         'php ' + composer + ' install --no-dev -o',
         'php ' + composer + ' dump-autoload -o'
@@ -133,15 +132,15 @@ export async function setupComposer(run_path = '') {
 
 async function downloadFile(url, destPath) {
     const response = await fetch(url);
-    
+
     if (!response.ok) {
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
     }
 
     const buffer = await response.arrayBuffer();
     await writeFile(destPath, Buffer.from(buffer));
-    
-    console.log(`✓ Saved to ${destPath}`);
+
+    logger.info(`Saved to ${destPath}`);
 }
 
 
