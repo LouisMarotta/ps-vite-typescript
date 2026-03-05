@@ -2,6 +2,8 @@
 import * as fs from 'fs';
 
 import os from 'os';
+import path from 'path';
+import process from 'process';
 import { execSync } from 'child_process';
 import { pad } from 'es-toolkit/string';
 import { isString } from 'es-toolkit/predicate';
@@ -10,6 +12,7 @@ import { configureSync, getConsoleSink } from "@logtape/logtape";
 import { prettyFormatter } from "@logtape/pretty";
 import { getLogger } from "@logtape/logtape";
 import { ZipWriter,  fs as zipFs } from '@zip.js/zip.js';
+import { writeFile } from 'fs/promises';
 
 
 const isWin = os.platform() === 'win32';
@@ -98,22 +101,48 @@ export async function jsCreateZip(zipPath, modulePath) {
     await fs.writeFile(zipPath, await zip.exportUint8Array());
 }
 
-export function setupComposer(path = '') {
+export async function setupComposer(run_path = '') {
+    const basePath =  path.resolve(process.cwd())
+    const composerInstaller = basePath + '/bin/composer-phar.php';
+    const composer = basePath + '/bin/composer';
+
+    if (!fs.existsSync(basePath + '/bin/composer')) {
+        if (!fs.existsSync(composerInstaller)) {
+            await downloadFile('https://getcomposer.org/installer', composerInstaller);
+        }
+
+        run('php ' + composerInstaller + ' --install-dir=' + basePath + '/bin --filename=composer --2.2');
+    }
+
     let commands = [
-        'composer install --no-dev -o',
-        'composer dump-autoload -o'
+        'php ' + composer + ' install --no-dev -o',
+        'php ' + composer + ' dump-autoload -o'
     ]
 
-    if (path && isString(path)) {
-        path = pad(path, 2, '"');
+    if (run_path && isString(run_path)) {
+        run_path = pad(run_path, 2, '"');
     } else {
-        path = '';
+        run_path = '';
     }
 
     commands.forEach(command => {
-        run(command + (path ? ' --working-dir=' + path : ''));
+        run(command + (run_path ? ' --working-dir=' + run_path : ''));
     });
 }
+
+async function downloadFile(url, destPath) {
+    const response = await fetch(url);
+
+    if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    }
+
+    const buffer = await response.arrayBuffer();
+    await writeFile(destPath, Buffer.from(buffer));
+
+    logger.info(`Saved to ${destPath}`);
+}
+
 
 
 /**

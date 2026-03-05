@@ -1,0 +1,63 @@
+name: prestashopvite
+services:
+  mysql:
+    container_name: db
+    image: mariadb:${MYSQL_VERSION:-lts}
+    restart: unless-stopped
+
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect"]
+      interval: 15s
+      timeout: 10s
+      retries: 5
+      start_period: 2s
+    environment:
+      MYSQL_HOST: mysql
+      MYSQL_ROOT_PASSWORD: ${MYSQL_PASSWORD:-prestashop}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-prestashop}
+      MYSQL_USER: ${MYSQL_USER:-prestashop}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-prestashop}
+    volumes:
+      # - ./db:/var/lib/mysql
+      - prestashop-db:/var/lib/mysql
+    networks:
+      - prestashop_network
+  prestashop:
+    container_name: prestashop
+    user: ${UID:-1000}:${GID:-1000}
+    image: prestashop/prestashop-flashlight:${PRESTASHOP_DOCKER_TAG:-latest}
+    restart: unless-stopped
+    depends_on:
+      mysql:
+        condition: service_healthy
+    ports:
+      - 8181:80
+    volumes:
+      # - ./prestashop:/var/www/html/:rw
+      - ./docker/init-scripts:/tmp/init-scripts:ro
+      - ./module:/var/www/html/modules/prestashopvite/
+    environment:
+      INIT_SCRIPTS_DIR: /tmp/init-scripts
+
+      DB_SERVER: db
+      PS_FOLDER: /var/www/html
+      PS_FOLDER_ADMIN: ${PS_FOLDER_ADMIN:-prestashop:admin-dev}
+      ADMIN_MAIL: ${PS_ADMIN_EMAIL:-admin@prestashop.com}
+      ADMIN_PASSWD: ${PS_ADMIN_PASSWORD:-prestashop}
+
+      DB_NAME: ${MYSQL_DATABASE:-prestashop}
+      DB_USER: ${MYSQL_USER:-prestashop}
+      DB_PASSWD: ${MYSQL_PASSWORD:-prestashop}
+
+      PS_INIT_SCRIPTS_ON_RESTART: true
+      PS_DEV_MODE: 1
+      PS_INSTALL_AUTO: 1
+      PS_ERASE_DB: 1
+      PS_INSTALL_DB: 1
+      PS_DOMAIN: ${BASE_URL:-localhost:8181}
+    networks:
+      - prestashop_network
+networks:
+    prestashop_network:
+volumes:
+    prestashop-db:
