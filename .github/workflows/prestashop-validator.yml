@@ -1,0 +1,79 @@
+name: PrestaShop Validator
+on: [push]
+
+jobs:
+  prestashop-validator:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        id: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Bun
+        uses: oven-sh/setup-bun@v2
+
+      - name: Install PHP ${{ env.PHP_VERSION || '7.4' }}
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ env.PHP_VERSION || '7.4' }}
+          tools: composer
+
+      - name: Build module
+        id: build
+        run: |
+          bun install
+          bun run build
+          zip=`basename -- $(find ./dist/ -name "prestashopvite_*.zip")`
+
+          echo "zip=$zip" >> $GITHUB_OUTPUT
+          echo "$zip"
+
+      - name: Validate module
+        id: validate
+        env:
+          PS_VALIDATOR_KEY: 092053c0464a12264499957d8abef7f7 # ${{ secrets.PRESTASHOP_VALIDATOR_API_KEY }} 
+        if: env.PS_VALIDATOR_KEY
+        uses: cssnr/web-request-action@v2
+        with:
+          url: "https://validator.prestashop.com/api/modules"
+          method: "POST"
+          params: |
+            {
+              "key": ${{ env.PS_VALIDATOR_KEY }}
+            }
+          file: ./dist/${{ steps.build.outputs.zip }}
+          name: archive
+
+      - name: Save validator output to file
+        id: parse
+        env:
+          VALIDATOR_JSON: ${{ steps.validate.outputs.data }}
+        run: |
+          mkdir -p artifacts
+
+          printf '%s' "$VALIDATOR_JSON" > artifacts/response.json
+
+          ERRORS_TOTAL=$(jq '.Details.results.errors // 0' artifacts/response.json)
+          ERRORS=$(jq '.Errors' artifacts/response.json)
+
+          echo "errors_total=$ERRORS_TOTAL" >> "$GITHUB_OUTPUT"
+          echo "$ERRORS" > artifacts/errors.json
+
+      - name: Upload validation artifact
+        uses: actions/upload-artifact@v6
+        with:
+          name: prestashop-validator
+          path: artifacts/
+          retention-days: 10
+
+      - name: Check validation results
+        id: check
+        run: |
+          ERRORS="${{ steps.parse.outputs.ERRORS_TOTAL }}"
+          if [ "$ERRORS" -gt 1 ]; then
+            echo "❌ Validator found $((ERRORS - 1)) error/s"
+            cat artifacts/report.json
+            exit 1
+          fi
+          echo "✅ Module passed validation"
