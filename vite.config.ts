@@ -62,7 +62,11 @@ export default defineConfig({
             },
             name: data.name,
         },
-        rollupOptions: {
+        rolldownOptions: {
+            input: {
+                'front': resolve(__dirname, 'src/front/main.ts'),
+                'back': resolve(__dirname, 'src/back/main.ts')
+            },
             output: {
                 entryFileNames: 'js/[name].js',
                 chunkFileNames: 'js/[name].js',
