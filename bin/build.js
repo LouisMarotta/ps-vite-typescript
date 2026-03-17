@@ -4,7 +4,7 @@ import path from 'path';
 import { simpleGit } from 'simple-git';
 import { snakeCase } from 'es-toolkit/string';
 import packageData from '../package.json' with { type: "json" };
-import { createZip, jsCreateZip, setupComposer } from './utils.js';
+import { addIndexPHP, createZip, setupComposer } from './utils.js';
 import { compileIncludes } from './preprocess.js';
 import { getLogger } from "@logtape/logtape";
 import { argv } from 'process';
@@ -29,16 +29,6 @@ try {
     // Get the last segment of the branch
     branch = branch.split('/').slice(-1)[0];
 } catch (e) { }
-
-async function addIndexPHP() {
-    async function* walk(dir) {
-        for await (const d of await fs.promises.opendir(dir)) {
-            const entry = path.join(dir, d.name);
-            if (d.isDirectory()) yield* walk(entry);
-            else if (d.isFile()) yield entry;
-        }
-    }
-}
 
 async function main() {
     try {
@@ -70,6 +60,8 @@ async function main() {
             let zipname = branch
                 ? `${filesystemName}_${branch}.zip`
                 : `${filesystemName}.zip`;
+
+            await addIndexPHP(`${BUILD_PATH}/${filesystemName}/`);
             createZip(`${BUILD_PATH}/${zipname}`, `${BUILD_PATH}/${filesystemName}/`);
         }
         logger.info('Done!', 'ok');

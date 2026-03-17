@@ -130,6 +130,33 @@ export async function setupComposer(run_path = '') {
     });
 }
 
+export async function addIndexPHP(dir, indexPhpPath = null) {
+    const basePath =  path.resolve(process.cwd())
+    const indexPath = path.join(dir, 'index.php');
+    if (!indexPhpPath) {
+        indexPhpPath = basePath + '/bin/index.php';
+    }
+    const indexPhpContent = fs.readFileSync(indexPhpPath, 'utf-8');
+    const exceptDirs = ['vendor'];
+
+    try {
+        fs.writeFileSync(indexPath, indexPhpContent, { flag: 'wx' });
+        console.log(`Created: ${indexPath}`);
+    } catch (err) {
+        if (err.code !== 'EEXIST') {
+            console.error(`Error processing ${indexPath}:`, err.message);
+        }
+    }
+
+    const dirHandle = await fs.opendirSync(dir);
+    for await (const entry of dirHandle) {
+        if (entry.isDirectory() && !exceptDirs.includes(entry.name)) {
+            const entryPath = path.join(dir, entry.name);
+            await addIndexPHP(entryPath);
+        }
+    }
+}
+
 async function downloadFile(url, destPath) {
     const response = await fetch(url);
 
