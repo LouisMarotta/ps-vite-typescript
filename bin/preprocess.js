@@ -17,9 +17,10 @@ const root = path.dirname(__dirname);
 
 export function compileIncludes(devMode = true, output = null) {
     let engine = new TemplateEngine();
+    let isHttps = true;
 
     // Build HMR url
-    let hmrUrl = `https://${hmrConfig.host}`;
+    let hmrUrl = `${isHttps ? 'https://' : 'http://'}${hmrConfig.host}`;
     if (hmrConfig.clientPort != 443) hmrUrl += `:${hmrConfig.clientPort}`
 
     // Fetch includes template

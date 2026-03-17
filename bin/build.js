@@ -4,9 +4,10 @@ import path from 'path';
 import { simpleGit } from 'simple-git';
 import { snakeCase } from 'es-toolkit/string';
 import packageData from '../package.json' with { type: "json" };
-import { createZip, jsCreateZip, setupComposer } from './utils.js';
+import { addIndexPHP, createZip, setupComposer } from './utils.js';
 import { compileIncludes } from './preprocess.js';
 import { getLogger } from "@logtape/logtape";
+import { argv } from 'process';
 
 let logger = getLogger('ps-module-builder');
 
@@ -29,37 +30,40 @@ try {
     branch = branch.split('/').slice(-1)[0];
 } catch (e) { }
 
-async function addIndexPHP() {
-    async function* walk(dir) {
-        for await (const d of await fs.promises.opendir(dir)) {
-            const entry = path.join(dir, d.name);
-            if (d.isDirectory()) yield* walk(entry);
-            else if (d.isFile()) yield entry;
-        }
-    }
-}
-
 async function main() {
     try {
-        let path = `${BUILD_PATH}/${filesystemName}`;
-        logger.info('Moving file to ' + path);
-        fs.cpSync(MODULE_PATH, path, {
-            recursive: true
-        });
+        const [, , ...args] = argv;
+
+        let isZipAction = args.length > 0 && args[0] == 'zip';
+
+        let path = isZipAction
+            ? `${BUILD_PATH}/${filesystemName}`
+            : MODULE_PATH;
+
+        if (isZipAction) {
+            logger.info('Moving file to ' + path);
+            fs.cpSync(MODULE_PATH, path, {
+                recursive: true
+            });
+        }
+
 
         // Generate the includes file with DEV mode off
         compileIncludes(false, `${path}/includes.inc.php`);
 
         logger.debug("Installing composer dependencies");
-        setupComposer(path);
+        await setupComposer(path);
         logger.info("Composer dependencies installed!");
 
-        logger.debug('Zipping file...');
+        if (isZipAction) {
+            logger.debug('Zipping file...');
+            let zipname = branch
+                ? `${filesystemName}_${branch}.zip`
+                : `${filesystemName}.zip`;
 
-        let zipname = branch
-            ? `${filesystemName}_${branch}.zip`
-            : `${filesystemName}.zip`;
-        createZip(`${BUILD_PATH}/${zipname}`, `${BUILD_PATH}/${filesystemName}/`);
+            await addIndexPHP(`${BUILD_PATH}/${filesystemName}/`);
+            createZip(`${BUILD_PATH}/${zipname}`, `${BUILD_PATH}/${filesystemName}/`);
+        }
         logger.info('Done!', 'ok');
     } catch (e) {
         logger.error('Error: ' + e, 'error');

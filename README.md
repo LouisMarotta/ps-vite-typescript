@@ -61,6 +61,13 @@ services:
 }
 ```
 
+## Playwright tests
+```shell
+bunx playwright install
+bun run docker:run:d
+bun run playwright:test
+```
+
 ## Tips and Gotcha's
 
 - To get jQuery's type completions, you must add `/// <reference types="jquery" />` at the start of the script

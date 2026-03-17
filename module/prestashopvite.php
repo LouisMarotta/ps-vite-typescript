@@ -20,9 +20,12 @@ class PrestashopVite extends Module
     public function __construct()
     {
         $this->name = 'prestashopvite';
+        $this->tab = 'front_office_features';
         $this->author = 'Louis Marotta';
         $this->version = '0.0.1';
+        $this->need_instance = 0;
         $this->ps_versions_compliancy = ['min' => '1.7.6', 'max' => _PS_VERSION_];
+        $this->bootstrap = true;
 
         parent::__construct();
 
