@@ -1,0 +1,44 @@
+name: Release and upload
+on:
+  workflow_dispatch: {}
+  push:
+    tags:
+      - "v*.*.*"
+
+permissions:
+  contents: write
+
+jobs:
+  tag:
+    name: Create new release
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        id: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Bun
+        uses: oven-sh/setup-bun@v2
+
+      - name: Install PHP ${{ env.PHP_VERSION || '7.4' }}
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ env.PHP_VERSION || '7.4' }}
+          tools: composer
+
+      - name: Build module
+        id: build
+        run: |
+          bun install
+          bun run build:zip
+          zip=`basename -- $(find ./dist/ -name "prestashopvite_*.zip")`
+
+          echo "zip=$zip" >> $GITHUB_OUTPUT
+          echo "$zip"
+
+      - name: Upload plugin on GitHub
+        id: upload-github
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ./dist/${{ steps.build.outputs.zip }}
