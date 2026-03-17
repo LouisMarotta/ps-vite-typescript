@@ -52,7 +52,7 @@ jobs:
         run: |
           mkdir -p artifacts
 
-          printf '%s' "$VALIDATOR_JSON" > artifacts/response.json
+          printf '%s' <<< "$VALIDATOR_JSON" > artifacts/response.json
 
           ERRORS_TOTAL=$(jq '.Details.results.errors // 0' artifacts/response.json)
           ERRORS=$(jq '.Errors' artifacts/response.json)
