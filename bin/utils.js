@@ -7,11 +7,10 @@ import process from 'process';
 import { execSync } from 'child_process';
 import { pad } from 'es-toolkit/string';
 import { isString } from 'es-toolkit/predicate';
-import archiver from 'archiver';
 import { configureSync, getConsoleSink } from "@logtape/logtape";
 import { prettyFormatter } from "@logtape/pretty";
 import { getLogger } from "@logtape/logtape";
-import { ZipWriter,  fs as zipFs } from '@zip.js/zip.js';
+import * as zipFs from "@zip.js/zip.js";  
 import { writeFile } from 'fs/promises';
 
 
@@ -25,7 +24,7 @@ const run = (cmd) => execSync(cmd, {
 let logConfigured = false;
 if (!logConfigured) {
     logConfigured = configureSync({
-        sinks: { console : getConsoleSink({ formatter: prettyFormatter })},
+        sinks: { console: getConsoleSink({ formatter: prettyFormatter }) },
         loggers: [
             {
                 category: ["logtape", "meta"]
@@ -40,69 +39,35 @@ if (!logConfigured) {
 }
 let logger = getLogger('ps-module-builder');
 
-export function createZip(zipPath, modulePath) {
-    // let file = fs.open(zipPath, 'w');
-    let output = fs.createWriteStream(zipPath);
-    output.on('close', function () {
-        logger.debug('>', (archive.pointer() / 1000000) + ' megabytes');
-    });
-    output.on('finish', () => logger.info('Zip successful'));
+async function addDirectoryRecursively(zipFs, dirPath, zipPath = "") {
+    const entries = await fs.promises.readdir(dirPath, { withFileTypes: true });
 
-    let archive = archiver('zip', {
-        zlib: {
-            level: 9
+    for (const entry of entries) {
+        const fullPath = path.join(dirPath, entry.name);
+        const relativePath = path.join(zipPath, entry.name);
+
+        if (entry.isDirectory()) {
+            const zipDir = zipFs.addDirectory(relativePath);
+            await addDirectoryRecursively(zipFs, fullPath, relativePath);
+        } else {
+            const fileData = await fs.promises.readFile(fullPath);
+            zipFs.addUint8Array(relativePath, fileData);
         }
-    })
-
-    archive.pipe(output);
-    try {
-        archive.glob('**/*', {
-            expand: true,
-            cwd: modulePath,
-            dot: true
-        });
-    } catch (e) {
-        logger.error("Unable to zip folder");
     }
-    archive.finalize();
 }
 
-export async function jsCreateZip(zipPath, modulePath) {
-    let zip = new zipFs.FS();
+export async function createZip(zipPath, modulePath) {
+    const zipFile = new zipFs.fs.FS();
+    await addDirectoryRecursively(zipFile, modulePath);
 
-    // We have to do this, and implement it with fsreaddirsyncpath
-    // https://github.com/gildas-lormeau/zip.js/issues/226#issuecomment-792964516
-    // https://nodejs.org/api/fs.html#fsreaddirsyncpath-
-    zip.addText("readme.txt", "This is a readme file");
-
-    console.log(modulePath);
-    // await zip.addFileSystemEntry(modulePath, {
-    //     directory: true,
-
-    // });
-
-    /*
-    let directory = {
-        isFile: false,
-        isDirectory: true,
-        fullPath: modulePath,
-        name: modulePath.split('/').pop() || modulePath.split('\\').pop()
-    };
-    */
-
-    let { directory } = await fs.readdir(modulePath);
-
-    // await zip.addFileSystemEntry(directory);
-    // zip.addDirectory(modulePath);
-    // await zip.addFileSystemEntry(modulePath, {
-    //     directory: true,
-    // })
-
-    await fs.writeFile(zipPath, await zip.exportUint8Array());
+    await fs.writeFileSync(
+        zipPath,
+        await zipFile.exportUint8Array()
+    );
 }
 
 export async function setupComposer(run_path = '') {
-    const basePath =  path.resolve(process.cwd())
+    const basePath = path.resolve(process.cwd())
     const composerInstaller = basePath + '/bin/composer-phar.php';
     const composer = basePath + '/bin/composer';
 
@@ -131,7 +96,7 @@ export async function setupComposer(run_path = '') {
 }
 
 export async function addIndexPHP(dir, indexPhpPath = null) {
-    const basePath =  path.resolve(process.cwd())
+    const basePath = path.resolve(process.cwd())
     const indexPath = path.join(dir, 'index.php');
     if (!indexPhpPath) {
         indexPhpPath = basePath + '/bin/index.php';
@@ -141,10 +106,10 @@ export async function addIndexPHP(dir, indexPhpPath = null) {
 
     try {
         fs.writeFileSync(indexPath, indexPhpContent, { flag: 'wx' });
-        console.log(`Created: ${indexPath}`);
+        logger.debug(`Created: ${indexPath}`);
     } catch (err) {
         if (err.code !== 'EEXIST') {
-            console.error(`Error processing ${indexPath}:`, err.message);
+            logger.error(`Error processing ${indexPath}:`, err.message);
         }
     }
 
