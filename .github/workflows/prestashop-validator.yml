@@ -73,7 +73,6 @@ jobs:
           ERRORS="${{ steps.parse.outputs.ERRORS_TOTAL }}"
           if [ "$ERRORS" -gt 1 ]; then
             echo "❌ Validator found $((ERRORS - 1)) error/s"
-            cat artifacts/report.json
             exit 1
           fi
           echo "✅ Module passed validation"
