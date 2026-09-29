@@ -20,11 +20,13 @@
     "build": "tsc && vite build && bun ./bin/build.js",
     "build:zip": "tsc && vite build && bun ./bin/build.js zip",
     "preview": "vite preview",
+    "typecheck": "tsc --noEmit",
     "clean": "rimraf dist",
     "playwright:test": "bunx playwright test",
     "playwright:test:ui": "bunx playwright test --ui",
-    "docker:run": "docker compose up",
-    "docker:run:d": "docker compose up -d"
+    "ddev:start": "ddev start",
+    "ddev:vite": "ddev vite",
+    "ddev:reset": "ddev reset"
   },
   "devDependencies": {
     "@logtape/logtape": "^1.3.7",
@@ -41,8 +43,7 @@
     "rimraf": "^6.1.3",
     "simple-git": "^3.33.0",
     "typescript": "~5.9.3",
-    "vite": "^8.0.0",
-    "vite-plugin-static-copy": "^3.3.0"
+    "vite": "^8.0.0"
   },
   "dependencies": {}
 }
