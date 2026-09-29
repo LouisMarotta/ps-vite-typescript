@@ -26,6 +26,14 @@ class IndexController extends FrameworkBundleAdminController
     }
 
     public function indexAction() {
+        if ($this->vite === null) {
+            // Module not found — render a helpful notice instead of crashing.
+            return $this->render(
+                '@Modules/' . $this->module_name . '/views/templates/admin/index.html.twig',
+                ['module_name' => $this->module_name, 'resources' => []]
+            );
+        }
+
         $resources = $this->vite->getResources('back');
         $this->params = array_merge($this->params, ['resources' => $resources]);
 

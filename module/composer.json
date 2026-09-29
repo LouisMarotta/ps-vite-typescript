@@ -15,13 +15,13 @@
     "psr-4": {
       "Module\\LouisMarotta\\PrestashopVite\\": "src/"
     },
-    "classmap": ["prestashopvite.php", "controllers/"],
-    "config": {
-      "prepend-autoloader": false
-    },
-    "type": "prestashop-module"
+    "classmap": ["prestashopvite.php", "controllers/"]
   },
   "require-dev": {
     "stancer/php-stubs-prestashop": "^8.2"
-  }
+  },
+  "config": {
+    "prepend-autoloader": false
+  },
+  "type": "prestashop-module"
 }
