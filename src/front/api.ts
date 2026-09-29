@@ -6,7 +6,9 @@ export interface ProductApiResponse {
 
 export function getProducts() {
     let url = window.location.origin;
-    let path = '/prestashopvite/show';
+    // The controller renders the page by default, so the product api has to be
+    // requested explicitly.
+    let path = '/prestashopvite/show?action=getProducts';
 
     return fetch(url + path)
     .then((body) => {

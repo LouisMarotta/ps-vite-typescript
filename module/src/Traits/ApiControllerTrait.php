@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Module\LouisMarotta\PrestashopVite\Traits;
 
 use Symfony\Component\HttpFoundation\Response;
@@ -12,14 +15,15 @@ trait ApiControllerTrait {
     /**
      * @param  array|string $message
      * @param  int    $status
+     * @param  array  $headers
      */
-    protected function sendResponse($message, $status = Response::HTTP_OK, $headers = [])
+    protected function sendResponse($message, $status = Response::HTTP_OK, array $headers = [])
     {
         (new JsonResponse(
-        $message,
-        $status,
-        array_merge(self::$default_headers, $headers)
+            $message,
+            $status,
+            array_merge(self::$default_headers, $headers)
         ))->send();
-        die(1);
+        exit;
     }
 }

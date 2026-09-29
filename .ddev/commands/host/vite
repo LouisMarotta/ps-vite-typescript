@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+## Description: Run the Vite dev server inside the web container
+## Usage: vite
+## Example: "ddev vite"
+ddev exec bun run dev

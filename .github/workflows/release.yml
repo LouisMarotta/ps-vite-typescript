@@ -31,7 +31,7 @@ jobs:
         id: build
         run: |
           bun install
-          bun run build
+          bun run build:zip
           zip=`basename -- $(find ./dist/ -name "prestashopvite_*.zip")`
 
           echo "zip=$zip" >> $GITHUB_OUTPUT

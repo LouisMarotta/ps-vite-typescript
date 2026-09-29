@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+
+## Description: Destroy the local store and rebuild it from scratch
+## Usage: reset
+## Example: "ddev reset"
+set -e
+
+ddev stop
+
+# Drop the installed store so the post-start hook reinstalls it, then wipe the
+# database so the installer starts from a clean slate.
+rm -rf .ddev/prestashop
+ddev delete -Oy
+
+ddev start

@@ -4,16 +4,14 @@ declare(strict_types=1);
 
 namespace Module\LouisMarotta\PrestashopVite\Classes\Vite;
 
-use Configuration;
-
 /**
  * Helper class for fetching the correct resources and handling URL's from vite
  */
 class Loader {
-    CONST POSITION_HEAD = 'top';
-    CONST POSITION_BOTTOM = 'bottom';
+    const POSITION_HEAD = 'top';
+    const POSITION_BOTTOM = 'bottom';
 
-    private $vite_host = 'http://localhost:5173';
+    private $vite_host = 'https://localhost:5173';
     private $module = null;
     private $manifest = [];
     private $dev = false;
@@ -39,9 +37,6 @@ class Loader {
             $this->dev = $dev;
         }
 
-        $this->setPriority(50);
-        $this->setPosition(self::POSITION_BOTTOM);
-
         // Get the vite host
         if (!$vite_host) {
             $vite_constant = $module->getModuleConstant() . '_VITE';
@@ -53,11 +48,6 @@ class Loader {
 
         // Save the manifest configs
         $this->manifest = $this->parseManifest();
-
-        $this->configuration = null;
-        if (class_exists(Configuration::class)) {
-            $this->configuration = new Configuration();
-        }
     }
 
     /**
@@ -97,10 +87,15 @@ class Loader {
         $manifest_path = $this->view_path . '.vite/manifest.json';
         if (file_exists($manifest_path)) {
             $file = file_get_contents($manifest_path);
+            $manifest = json_decode($file, true);
 
-            try {
-                $manifest = json_decode($file, true);
-            } catch (\Exception $e) { }
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                throw new \RuntimeException(sprintf(
+                    'Failed to parse manifest at %s: %s',
+                    $manifest_path,
+                    json_last_error_msg()
+                ));
+            }
         }
 
         return $manifest;
@@ -112,6 +107,21 @@ class Loader {
      */
     public function getHMRUrl() {
         return $this->vite_host . '/@vite/client';
+    }
+
+    /**
+     * Resolve a file from src/static, which Vite serves from its root in dev
+     * and copies into views/ on build.
+     *
+     * @param string $path Path relative to the static folder, e.g. 'img/logo.svg'
+     * @return string
+     */
+    public function getStaticUrl($path = '') {
+        $base = $this->dev
+            ? rtrim($this->vite_host, '/') . '/'
+            : $this->getUriFromPath($this->view_path);
+
+        return $base . ltrim($path, '/');
     }
 
 
@@ -140,6 +150,12 @@ class Loader {
         }
 
         foreach ($this->manifest as $dev_url => $data) {
+            // The manifest also lists the emitted assets and the shared chunks,
+            // only the entry points belong in a script tag.
+            if (empty($data['isEntry'])) {
+                continue;
+            }
+
             if ($type && $type != $data['name']) {
                 continue;
             }

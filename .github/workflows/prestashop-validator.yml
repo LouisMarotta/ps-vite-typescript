@@ -23,7 +23,7 @@ jobs:
         id: build
         run: |
           bun install
-          bun run build
+          bun run build:zip
           zip=`basename -- $(find ./dist/ -name "prestashopvite_*.zip")`
 
           echo "zip=$zip" >> $GITHUB_OUTPUT
@@ -32,7 +32,7 @@ jobs:
       - name: Validate module
         id: validate
         env:
-          PS_VALIDATOR_KEY: 092053c0464a12264499957d8abef7f7 # ${{ secrets.PRESTASHOP_VALIDATOR_API_KEY }} 
+          PS_VALIDATOR_KEY: ${{ secrets.PRESTASHOP_VALIDATOR_API_KEY }} 
         if: env.PS_VALIDATOR_KEY
         uses: cssnr/web-request-action@v2
         with:
@@ -52,7 +52,7 @@ jobs:
         run: |
           mkdir -p artifacts
 
-          printf '%s' "$VALIDATOR_JSON" > artifacts/response.json
+          printf '%s' <<< "$VALIDATOR_JSON" > artifacts/response.json
 
           ERRORS_TOTAL=$(jq '.Details.results.errors // 0' artifacts/response.json)
           ERRORS=$(jq '.Errors' artifacts/response.json)
