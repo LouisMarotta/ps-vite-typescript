@@ -9,7 +9,9 @@ const envPath = path.resolve(__dirname, '.env');
 dotenv.config({ path: envPath });
 export default defineConfig({
     use: {
-        baseURL: process.env.BASE_URL
+        baseURL: process.env.BASE_URL,
+        // DDEV serves the store over HTTPS with a locally generated certificate.
+        ignoreHTTPSErrors: true
     },
     testDir: 'tests',
     reporter: process.env.CI 

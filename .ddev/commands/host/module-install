@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+
+## Description: Reinstall and enable the module in the running store
+## Usage: module-install
+## Example: "ddev module-install"
+set -e
+
+CONSOLE="/var/www/html/.ddev/prestashop/bin/console"
+
+ddev exec php "${CONSOLE}" prestashop:module install prestashopvite || true
+ddev exec php "${CONSOLE}" prestashop:module enable prestashopvite
