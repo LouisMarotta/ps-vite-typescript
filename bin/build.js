@@ -64,9 +64,10 @@ async function main() {
             await addIndexPHP(`${BUILD_PATH}/${filesystemName}/`);
             createZip(`${BUILD_PATH}/${zipname}`, `${BUILD_PATH}/${filesystemName}/`);
         }
-        logger.info('Done!', 'ok');
+        logger.info('Done!');
     } catch (e) {
         logger.error('Error: ' + e, 'error');
+        process.exitCode = 1;
     }
 }
 main();

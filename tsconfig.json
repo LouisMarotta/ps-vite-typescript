@@ -15,6 +15,13 @@
     "moduleDetection": "force",
     "noEmit": true,
 
+    /* Path alias matching vite.config.ts */
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"]
+    },
+    "ignoreDeprecations": "6.0",
+
     /* Linting */
     "strict": true,
     "noUnusedLocals": true,
@@ -23,5 +30,6 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true
   },
-  "include": ["src","dist"]
+  "include": ["src", "*.ts", "tests", "bin", "environment.d.ts"],
+  "exclude": ["dist", "node_modules", ".ddev"]
 }
