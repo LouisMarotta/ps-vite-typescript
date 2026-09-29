@@ -35,7 +35,7 @@ class PrestashopVite extends Module
 
     public function install() {
         return parent::install()
-            && $this->registerHook('header')
+            && $this->registerHook('displayHeader')
             && $this->registerHook('moduleRoutes');
     }
 
@@ -46,21 +46,21 @@ class PrestashopVite extends Module
         );
     }
 
-    public function hookHeader() {
-        $this->hookDisplayHeader();
-    }
-
     public function hookDisplayHeader() {
+        if (isset($this->context->controller->ajax) && $this->context->controller->ajax) {
+            return '';
+        }
+
         $templatePath = _PS_MODULE_DIR_ . $this->name . '/views/templates/components/scripts.tpl';
         $loader = new Loader($this);
-        if (!$this->context->controller->ajax) {
-            $resources = $loader->getResources('front');
-            $this->context->smarty->assign([
-                'scripts' => $resources['js'],
-                'styles' => $resources['css'],
-            ]);
-            echo($this->fetch($templatePath));
-        }
+        $resources = $loader->getResources('front');
+        $this->context->smarty->assign([
+            'scripts' => $resources['js'],
+            'styles' => $resources['css'],
+        ]);
+
+
+        return $this->fetch($templatePath);
     }
 
     public function hookModuleRoutes($params)
