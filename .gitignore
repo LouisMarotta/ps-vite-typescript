@@ -27,9 +27,6 @@ hmr.json
 # Test
 test-results/**
 
-# Docker
-prestashop/**
-
 # Build
 dist/*
 dist-ssr/*
@@ -49,6 +46,11 @@ dist-ssr/*
 /module/views/.vite
 /module/views/js
 /module/views/css
+/module/views/img
+/module/views/fonts
 
 # Exclude gitkeep
 !**/.gitkeep
+
+# ...but keep them out of the generated module output
+/module/views/**/.gitkeep

@@ -49,7 +49,8 @@ async function addDirectoryRecursively(zipFs, dirPath, zipPath = "") {
         if (entry.isDirectory()) {
             const zipDir = zipFs.addDirectory(relativePath);
             await addDirectoryRecursively(zipFs, fullPath, relativePath);
-        } else {
+        } else if (entry.name !== '.gitkeep') {
+            // gitkeep files only exist to keep empty folders in the repository
             const fileData = await fs.promises.readFile(fullPath);
             zipFs.addUint8Array(relativePath, fileData);
         }
